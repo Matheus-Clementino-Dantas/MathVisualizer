@@ -9,8 +9,35 @@
   --color-text: oklch(90% 0 0);
 }
 
+.MafsView {
+
+  --mafs-bg: transparent !important;
+  --mafs-fg: oklch(100% 0 0) !important;
+  --mafs-line-color: oklch(20% 0 0) !important;
+
+  --mafs-origin-color: oklch(100% 0 0) !important;
+
+}
+
+
+:root.light .MafsView {
+  --mafs-bg: transparent !important;
+  --mafs-fg: oklch(0% 0 0) !important;
+  --mafs-line-color: oklch(90% 0 0) !important;
+  --mafs-origin-color: oklch(0% 0 0) !important;
+}
+
 .light {
   --color-bg: oklch(95% 0 0);
   --color-layer: oklch(88% 0 0);
   --color-text: oklch(10% 0 0);
+}
+
+.vignette {
+  -webkit-mask-image: radial-gradient(circle, black 50%, transparent 80%);
+  mask-image: radial-gradient(circle, black 50%, transparent 80%);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: cover;
+  mask-size: cover;
 }

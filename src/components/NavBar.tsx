@@ -30,7 +30,7 @@ export function NavBar() {
               <AudioWaveform className="inline" />
             </h1>
           </div>
-          <div className="min-w-80 max-w-xl fixed bottom-4 left-1/2 -translate-x-1/2 md:relative md:flex-1 md:mx-8 md:bottom-0 md:translate-x-0 md:left-0">
+          <div className="min-w-80 max-w-xl fixed bottom-4 left-1/2 -translate-x-1/2 md:relative md:flex-1 md:mx-8 md:bottom-0 md:translate-x-0 md:left-0 backdrop-blur-sm">
             <div className="flex items-center  border border-gray-700 rounded-lg px-4 py-2 focus-within:border-green-500 focus-within:ring-1 focus-within:ring-green-500 transition-all">
               <span className="text-green-500 font-site font-bold mr-3 animate-pulse">
                 &gt;
