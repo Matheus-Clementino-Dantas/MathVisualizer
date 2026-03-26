@@ -63,7 +63,7 @@ export function NavBar() {
                 About
               </a>
             </li>
-            <li className="text-text">
+            <li className="text-text hover:text-green-500">
               <a
                 href="https://github.com/Matheus-Clementino-Dantas/MathVisualizer"
                 target="_blank"
@@ -71,12 +71,12 @@ export function NavBar() {
                 <GithubIcon className="w-4 h-4 sm:w-6 sm:h-6" />
               </a>
             </li>
-            <li className="text-text">
-              <button className="cursor-pointer flex justify-center items-center">
-                <SunMoon
-                  className="w-5 h-5 sm:w-8 sm:h-8"
-                  onClick={toggleTheme}
-                />
+            <li>
+              <button
+                className={`cursor-pointer flex text-text justify-center transition-colors items-center ${theme === "light" ? "hover:text-indigo-400" : "hover:text-amber-300"}`}
+                onClick={toggleTheme}
+              >
+                <SunMoon className="w-5 h-5 sm:w-8 sm:h-8" />
               </button>
             </li>
           </ul>
