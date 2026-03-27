@@ -1,5 +1,6 @@
-import { Mafs, Coordinates } from "mafs";
+import { Mafs, Coordinates, Plot } from "mafs";
 import { useState, useEffect } from "react";
+
 export function CartesianPlan() {
   const [size, setSize] = useState({
     width: window.innerWidth,
@@ -21,6 +22,7 @@ export function CartesianPlan() {
     <div className="h-full w-full justify-center items-center flex vignette">
       <Mafs width={size.width} height={size.height}>
         <Coordinates.Cartesian subdivisions={3} />
+        <Plot.OfX y={(x) => Math.sin(x)} />
       </Mafs>
     </div>
   );

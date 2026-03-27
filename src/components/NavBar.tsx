@@ -1,4 +1,4 @@
-import { AudioWaveform, SunMoon } from "lucide-react";
+import { AudioWaveform, SunMoon, Play } from "lucide-react";
 import { GithubIcon } from "./Githubicon";
 import { useState, useEffect } from "react";
 
@@ -38,11 +38,17 @@ export function NavBar() {
 
               <input
                 type="text"
-                className="bg-transparent text-text font-site tracking-wider w-full outline-none placeholder-gray-600 text-sm sm:text-lg "
+                className="bg-transparent text-text font-site tracking-wider w-full outline-none placeholder-gray-600 text-sm md:text-lg "
                 placeholder="commands ex: quad 2 -4 5"
                 autoComplete="off"
                 spellCheck="false"
               />
+              <button
+                className="text-green-500 cursor-pointer"
+                aria-label="execute"
+              >
+                <Play />
+              </button>
             </div>
           </div>
 
