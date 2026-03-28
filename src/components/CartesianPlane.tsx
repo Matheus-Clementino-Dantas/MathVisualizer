@@ -6,10 +6,12 @@ type Settings = {
     x: [number, number];
     y: [number, number];
   };
+  zoom?: boolean;
 };
 type PlotConfig = {
   id: string;
   mathFunction: (x: number) => number;
+  color?: string;
 };
 type Props = {
   settings: Settings;
@@ -39,11 +41,11 @@ export function CartesianPlan({ settings, plots }: Props) {
         width={size.width}
         height={size.height}
         viewBox={settings.viewBox}
-        zoom={true}
+        zoom={settings.zoom}
       >
         <Coordinates.Cartesian subdivisions={1} />
         {plots.map((plot) => (
-          <Plot.OfX key={plot.id} y={plot.mathFunction} />
+          <Plot.OfX key={plot.id} y={plot.mathFunction} color={plot.color} />
         ))}
       </Mafs>
     </div>
