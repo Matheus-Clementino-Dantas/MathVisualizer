@@ -9,6 +9,14 @@
   --color-text: oklch(90% 0 0);
 }
 
+:root {
+  --plot: oklch(87.185% 0.28725 141.147);
+}
+
+:root.light {
+  --plot: oklch(54.569% 0.16912 139.544);
+}
+
 .MafsView {
 
   --mafs-bg: transparent !important;

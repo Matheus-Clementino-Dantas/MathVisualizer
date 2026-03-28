@@ -18,7 +18,7 @@ export function Message({
       clearTimeout(timer);
       clearTimeout(removeTimer);
     };
-  }, [onClose]);
+  }, []);
 
   if (!text) return null;
   return (
