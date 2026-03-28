@@ -1,7 +1,22 @@
 import { Mafs, Coordinates, Plot } from "mafs";
 import { useState, useEffect } from "react";
 
-export function CartesianPlan() {
+type Settings = {
+  viewBox: {
+    x: [number, number];
+    y: [number, number];
+  };
+};
+type PlotConfig = {
+  id: string;
+  mathFunction: (x: number) => number;
+};
+type Props = {
+  settings: Settings;
+  plots: PlotConfig[];
+};
+
+export function CartesianPlan({ settings, plots }: Props) {
   const [size, setSize] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
@@ -20,9 +35,16 @@ export function CartesianPlan() {
 
   return (
     <div className="h-full w-full justify-center items-center flex vignette">
-      <Mafs width={size.width} height={size.height}>
-        <Coordinates.Cartesian subdivisions={3} />
-        <Plot.OfX y={(x) => Math.sin(x)} />
+      <Mafs
+        width={size.width}
+        height={size.height}
+        viewBox={settings.viewBox}
+        zoom={true}
+      >
+        <Coordinates.Cartesian subdivisions={1} />
+        {plots.map((plot) => (
+          <Plot.OfX key={plot.id} y={plot.mathFunction} />
+        ))}
       </Mafs>
     </div>
   );

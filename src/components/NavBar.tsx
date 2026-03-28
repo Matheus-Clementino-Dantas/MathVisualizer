@@ -2,7 +2,12 @@ import { AudioWaveform, SunMoon, Play } from "lucide-react";
 import { GithubIcon } from "./Githubicon";
 import { useState, useEffect } from "react";
 
-export function NavBar() {
+export function NavBar({
+  processCommand,
+}: {
+  processCommand: (input: string) => void;
+}) {
+  const [command, setCommand] = useState("");
   const [theme, setTheme] = useState<"dark" | "light">(
     (localStorage.getItem("theme") as "dark" | "light") || "dark",
   );
@@ -42,10 +47,22 @@ export function NavBar() {
                 placeholder="commands ex: quad 2 -4 5"
                 autoComplete="off"
                 spellCheck="false"
+                value={command}
+                onChange={(e) => setCommand(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    processCommand(command);
+                    setCommand("");
+                  }
+                }}
               />
               <button
                 className="text-green-500 cursor-pointer"
                 aria-label="execute"
+                onClick={() => {
+                  processCommand(command);
+                  setCommand("");
+                }}
               >
                 <Play />
               </button>
