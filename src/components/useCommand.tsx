@@ -18,9 +18,29 @@ export function useCommand({
     const [cmd, ...args] = input.trim().toLowerCase().split(/\s+/);
 
     const getNum = (index: number, defaultVal: number) => {
-      if (!args[index]) return defaultVal;
+      if (args[index] === undefined || args[index] === "_") return defaultVal;
       const num = Number(args[index]);
       return isNaN(num) ? defaultVal : num;
+    };
+
+    const getExpression = (
+      type: PlotConfig["type"],
+      params: PlotConfig["params"],
+    ) => {
+      switch (type) {
+        case "quad":
+          return `f(x) = ${params.a}x² ${params.b === 0 ? "" : `+ ${params.b}x`} ${params.c === 0 ? "" : `+ ${params.c}`}`;
+        case "linear":
+          return `f(x) = ${params.a}x ${params.b === 0 ? "" : `+ ${params.b}`}`;
+        case "sin":
+        case "cos":
+          return `f(x) = ${params.a} * ${type}(${params.b}x${params.c === 0 ? "" : ` + ${params.c}`}) ${params.d === 0 ? "" : `+ ${params.d}`}`;
+        default:
+          addMessage(
+            "Error: Expression generation for this type not implemented.",
+          );
+          return "Error";
+      }
     };
 
     switch (cmd) {
@@ -43,7 +63,7 @@ export function useCommand({
             params: { a, b, c },
             mathFunction: (x) => a * x ** 2 + b * x + c,
             color,
-            expression: `f(x) = ${a}x² ${b === 0 ? "" : `+ ${b}x`} ${c === 0 ? "" : `+ ${c}`}`,
+            expression: getExpression("quad", { a, b, c }),
           },
         ]);
         addMessage(`quad '${id}' plotted.`);
@@ -66,7 +86,7 @@ export function useCommand({
           params: { a, b },
           mathFunction: (x) => a * x + b,
           color,
-          expression: `f(x) = ${a}x ${b === 0 ? "" : `+ ${b}`}`,
+          expression: getExpression("linear", { a, b }),
         };
         setPlots((prev) => [...prev, newPlot]);
         addMessage(`Linear '${id}' plotted.`);
@@ -95,7 +115,7 @@ export function useCommand({
               ? a * Math.sin(b * x + c) + d
               : a * Math.cos(b * x + c) + d,
           color,
-          expression: `f(x) = ${a} * ${cmd}(${b}x ${c === 0 ? "" : `+ ${c}`}) ${d === 0 ? "" : `+ ${d}`}`,
+          expression: getExpression(cmd, { a, b, c, d }),
         };
         setPlots((prev) => [...prev, newPlot]);
         addMessage(`Function ${cmd} '${id}' plotted.`);
@@ -137,7 +157,7 @@ export function useCommand({
             ...existingPlot,
             params: { a, b, c },
             mathFunction: (x) => a * x ** 2 + b * x + c,
-            expression: `f(x) = ${a}x² ${b === 0 ? "" : `+ ${b}x`} ${c === 0 ? "" : `+ ${c}`}`,
+            expression: getExpression("quad", { a, b, c }),
           };
         } else if (existingPlot.type === "linear") {
           const old = existingPlot.params;
@@ -148,7 +168,7 @@ export function useCommand({
             ...existingPlot,
             params: { a, b },
             mathFunction: (x) => a * x + b,
-            expression: `f(x) = ${a}x ${b === 0 ? "" : `+ ${b}`}`,
+            expression: getExpression("linear", { a, b }),
           };
         } else if (existingPlot.type === "sin" || existingPlot.type === "cos") {
           const old = existingPlot.params;
@@ -164,7 +184,7 @@ export function useCommand({
               existingPlot.type === "sin"
                 ? a * Math.sin(b * x + c) + d
                 : a * Math.cos(b * x + c) + d,
-            expression: `f(x) = ${a} * ${cmd}(${b}x ${c === 0 ? "" : `+ ${c}`}) ${d === 0 ? "" : `+ ${d}`}`,
+            expression: getExpression(existingPlot.type, { a, b, c, d }),
           };
         } else {
           addMessage(
