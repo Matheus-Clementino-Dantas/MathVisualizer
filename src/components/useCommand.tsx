@@ -17,9 +17,52 @@ export function useCommand({
   const processCommand = (input: string) => {
     const [cmd, ...args] = input.trim().toLowerCase().split(/\s+/);
 
+    const createPlot = (
+      type: PlotConfig["type"],
+      params: PlotConfig["params"],
+      id: string,
+      color: string,
+    ) => {
+      if (plots.some((p) => p.id === id)) {
+        addMessage(`Error: ID '${id}' already exists.`);
+        return;
+      }
+      if (!isNaN(Number(color))) {
+        addMessage(
+          `Warning: '${color}' is not a valid color. Applying default color`,
+        );
+        color = "";
+      }
+
+      return {
+        id,
+        type,
+        params,
+        mathFunction: (x: number) => {
+          const { a = 0, b = 0, c = 0, d = 0 } = params;
+          switch (type) {
+            case "quad":
+              return a * x ** 2 + b * x + c;
+            case "linear":
+              return a * x + b;
+            case "sin":
+              return a * Math.sin(b * x + c) + d;
+            case "cos":
+              return a * Math.cos(b * x + c) + d;
+            default:
+              return 0;
+          }
+        },
+        color,
+        expression: getExpression(type, params),
+      };
+    };
+
     const getNum = (index: number, defaultVal: number) => {
-      if (args[index] === undefined || args[index] === "_") return defaultVal;
-      const num = Number(args[index]);
+      const arg = args[index];
+      if (arg === undefined || arg === "_") return defaultVal;
+
+      const num = Number(arg);
       return isNaN(num) ? defaultVal : num;
     };
 
@@ -52,20 +95,24 @@ export function useCommand({
         const a = getNum(0, 1);
         const b = getNum(1, 0);
         const c = getNum(2, 0);
-        const id = args[3] || crypto.randomUUID();
+        const id = args[3];
         const color = args[4] || "";
 
-        setPlots((prev) => [
-          ...prev,
-          {
-            id,
-            type: "quad",
-            params: { a, b, c },
-            mathFunction: (x) => a * x ** 2 + b * x + c,
-            color,
-            expression: getExpression("quad", { a, b, c }),
-          },
-        ]);
+        if (!id) {
+          addMessage(
+            "Error: 'quad' command requires an ID as the 4th argument.",
+          );
+          break;
+        }
+
+        const newPlot = createPlot("quad", { a, b, c }, id, color);
+
+        if (!newPlot) {
+          addMessage("Error: Failed to create plot.");
+          break;
+        }
+
+        setPlots((prev) => [...prev, newPlot]);
         addMessage(`quad '${id}' plotted.`);
         break;
       }
