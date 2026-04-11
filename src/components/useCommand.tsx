@@ -23,10 +23,6 @@ export function useCommand({
       id: string,
       color: string,
     ) => {
-      if (plots.some((p) => p.id === id)) {
-        addMessage(`Error: ID '${id}' already exists.`);
-        return;
-      }
       if (!isNaN(Number(color))) {
         addMessage(
           `Warning: '${color}' is not a valid color. Applying default color`,
@@ -39,16 +35,21 @@ export function useCommand({
         type,
         params,
         mathFunction: (x: number) => {
-          const { a = 0, b = 0, c = 0, d = 0 } = params;
+          const {
+            a = { val: 0, strVal: "0" },
+            b = { val: 0, strVal: "0" },
+            c = { val: 0, strVal: "0" },
+            d = { val: 0, strVal: "0" },
+          } = params;
           switch (type) {
             case "quad":
-              return a * x ** 2 + b * x + c;
+              return a.val * x ** 2 + b.val * x + c.val;
             case "linear":
-              return a * x + b;
+              return a.val * x + b.val;
             case "sin":
-              return a * Math.sin(b * x + c) + d;
+              return a.val * Math.sin(b.val * x + c.val) + d.val;
             case "cos":
-              return a * Math.cos(b * x + c) + d;
+              return a.val * Math.cos(b.val * x + c.val) + d.val;
             default:
               return 0;
           }
@@ -60,24 +61,60 @@ export function useCommand({
 
     const getNum = (index: number, defaultVal: number) => {
       const arg = args[index];
-      if (arg === undefined || arg === "_") return defaultVal;
 
-      const num = Number(arg);
-      return isNaN(num) ? defaultVal : num;
+      const fallback = {
+        val: defaultVal,
+        strVal: defaultVal.toString(),
+      };
+
+      if (arg === undefined || arg === "_") return fallback;
+
+      const raw = arg.toLowerCase().replace("pi", "π");
+
+      if (raw === "π") {
+        return { val: Math.PI, strVal: raw };
+      }
+
+      if (raw.includes("/")) {
+        const [numStr, denStr] = raw.split("/");
+
+        if (!numStr || !denStr) return fallback;
+
+        const numerator = numStr === "π" ? Math.PI : Number(numStr);
+        const denominator = Number(denStr);
+
+        if (!isNaN(numerator) && !isNaN(denominator) && denominator !== 0) {
+          return { val: numerator / denominator, strVal: raw };
+        }
+
+        return fallback;
+      }
+
+      const num = Number(raw);
+
+      if (isNaN(num)) return fallback;
+
+      return { val: num, strVal: raw };
     };
 
     const getExpression = (
       type: PlotConfig["type"],
       params: PlotConfig["params"],
     ) => {
+      const {
+        a,
+        b,
+        c = { val: 0, strVal: "0" },
+        d = { val: 0, strVal: "0" },
+      } = params;
       switch (type) {
         case "quad":
-          return `f(x) = ${params.a}x² ${params.b === 0 ? "" : `+ ${params.b}x`} ${params.c === 0 ? "" : `+ ${params.c}`}`;
+          return `f(x) = ${a.strVal}x² ${b.strVal === "0" ? "" : `+ ${b.strVal}x`} ${c.strVal === "0" ? "" : `+ ${c.strVal}`}`;
         case "linear":
-          return `f(x) = ${params.a}x ${params.b === 0 ? "" : `+ ${params.b}`}`;
+          return `f(x) = ${a.strVal}x ${b.strVal === "0" ? "" : `+ ${b.strVal}`}`;
         case "sin":
         case "cos":
-          return `f(x) = ${params.a} * ${type}(${params.b}x${params.c === 0 ? "" : ` + ${params.c}`}) ${params.d === 0 ? "" : `+ ${params.d}`}`;
+          return `f(x) = ${a.strVal} * ${type}(${b.strVal}x${c.strVal === "0" ? "" : ` + ${c.strVal}`}) ${d.strVal === "0" ? "" : `+ ${d.strVal}`}`;
         default:
           addMessage(
             "Error: Expression generation for this type not implemented.",
@@ -105,12 +142,15 @@ export function useCommand({
           break;
         }
 
-        const newPlot = createPlot("quad", { a, b, c }, id, color);
-
-        if (!newPlot) {
-          addMessage("Error: Failed to create plot.");
+        // Validação de ID movida para cá
+        if (plots.some((p) => p.id === id)) {
+          addMessage(`Error: ID '${id}' already exists.`);
           break;
         }
+
+        const newPlot = createPlot("quad", { a, b, c }, id, color);
+
+        if (!newPlot) break;
 
         setPlots((prev) => [...prev, newPlot]);
         addMessage(`quad '${id}' plotted.`);
@@ -127,15 +167,16 @@ export function useCommand({
         const id = args[2] || crypto.randomUUID();
         const color = args[3] || "";
 
-        const newPlot: PlotConfig = {
-          id,
-          type: "linear",
-          params: { a, b },
-          mathFunction: (x) => a * x + b,
-          color,
-          expression: getExpression("linear", { a, b }),
-        };
-        setPlots((prev) => [...prev, newPlot]);
+        if (plots.some((p) => p.id === id)) {
+          addMessage(`Error: ID '${id}' already exists.`);
+          break;
+        }
+
+        // Usando a fábrica em vez de montar na mão
+        const newPlot = createPlot("linear", { a, b }, id, color);
+        if (!newPlot) break;
+
+        setPlots((prev) => [...prev, newPlot as PlotConfig]);
         addMessage(`Linear '${id}' plotted.`);
         break;
       }
@@ -153,20 +194,16 @@ export function useCommand({
         const id = args[4] || crypto.randomUUID();
         const color = args[5] || "";
 
-        const newPlot: PlotConfig = {
-          id,
-          type: cmd === "sin" ? "sin" : "cos",
-          params: { a, b, c, d },
-          mathFunction: (x) =>
-            cmd === "sin"
-              ? a * Math.sin(b * x + c) + d
-              : a * Math.cos(b * x + c) + d,
-          color,
-          expression: getExpression(cmd, { a, b, c, d }),
-        };
-        setPlots((prev) => [...prev, newPlot]);
-        addMessage(`Function ${cmd} '${id}' plotted.`);
+        if (plots.some((p) => p.id === id)) {
+          addMessage(`Error: ID '${id}' already exists.`);
+          break;
+        }
 
+        const newPlot = createPlot(cmd, { a, b, c, d }, id, color);
+        if (!newPlot) break;
+
+        setPlots((prev) => [...prev, newPlot as PlotConfig]);
+        addMessage(`Function ${cmd} '${id}' plotted.`);
         break;
       }
 
@@ -184,65 +221,78 @@ export function useCommand({
           break;
         }
 
-        const getUpdatedNum = (index: number, oldVal: number) => {
+        // Nova função adaptada para lidar com os objetos
+        const getUpdatedParam = (
+          index: number,
+          oldParam: { val: number; strVal: string },
+        ) => {
           const arg = args[index];
-          if (!arg || arg === "_") return oldVal;
-          const num = Number(arg);
-          return isNaN(num) ? oldVal : num;
+          if (!arg || arg === "_") return oldParam;
+
+          const parsed = getNum(index, oldParam.val);
+
+          // Previne que entradas inválidas subscrevam a string bonita original
+          if (
+            parsed.strVal === oldParam.val.toString() &&
+            arg !== oldParam.val.toString() &&
+            isNaN(Number(arg))
+          ) {
+            return oldParam;
+          }
+          return parsed;
         };
 
         let updatedPlot: PlotConfig;
 
         if (existingPlot.type === "quad") {
           const old = existingPlot.params;
+          const a = getUpdatedParam(1, old.a!);
+          const b = getUpdatedParam(2, old.b!);
+          const c = getUpdatedParam(3, old.c!);
 
-          const a = getUpdatedNum(1, old.a);
-          const b = getUpdatedNum(2, old.b);
-          const c = getUpdatedNum(3, old.c || 0);
-
-          updatedPlot = {
-            ...existingPlot,
-            params: { a, b, c },
-            mathFunction: (x) => a * x ** 2 + b * x + c,
-            expression: getExpression("quad", { a, b, c }),
-          };
+          updatedPlot = createPlot(
+            "quad",
+            { a, b, c },
+            idToUpdate,
+            existingPlot.color,
+          );
         } else if (existingPlot.type === "linear") {
           const old = existingPlot.params;
-          const a = getUpdatedNum(1, old.a);
-          const b = getUpdatedNum(2, old.b);
+          const a = getUpdatedParam(1, old.a!);
+          const b = getUpdatedParam(2, old.b!);
 
-          updatedPlot = {
-            ...existingPlot,
-            params: { a, b },
-            mathFunction: (x) => a * x + b,
-            expression: getExpression("linear", { a, b }),
-          };
+          updatedPlot = createPlot(
+            "linear",
+            { a, b },
+            idToUpdate,
+            existingPlot.color,
+          );
         } else if (existingPlot.type === "sin" || existingPlot.type === "cos") {
           const old = existingPlot.params;
-          const a = getUpdatedNum(1, old.a);
-          const b = getUpdatedNum(2, old.b);
-          const c = getUpdatedNum(3, old.c || 0);
-          const d = getUpdatedNum(4, old.d || 0);
+          const a = getUpdatedParam(1, old.a!);
+          const b = getUpdatedParam(2, old.b!);
+          const c = getUpdatedParam(3, old.c!);
+          const d = getUpdatedParam(4, old.d!);
 
-          updatedPlot = {
-            ...existingPlot,
-            params: { a, b, c, d },
-            mathFunction: (x) =>
-              existingPlot.type === "sin"
-                ? a * Math.sin(b * x + c) + d
-                : a * Math.cos(b * x + c) + d,
-            expression: getExpression(existingPlot.type, { a, b, c, d }),
-          };
+          updatedPlot = createPlot(
+            existingPlot.type,
+            { a, b, c, d },
+            idToUpdate,
+            existingPlot.color,
+          );
         } else {
           addMessage(
             `Error: Update for ${existingPlot.type} doesn't exist yet.`,
           );
           break;
         }
-        setPlots((prev) =>
-          prev.map((plot) => (plot.id === idToUpdate ? updatedPlot : plot)),
-        );
-        addMessage(`plot '${idToUpdate}' updated.`);
+
+        if (updatedPlot) {
+          setPlots((prev) =>
+            prev.map((plot) => (plot.id === idToUpdate ? updatedPlot : plot)),
+          );
+          addMessage(`plot '${idToUpdate}' updated.`);
+        }
         break;
       }
 

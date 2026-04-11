@@ -9,7 +9,12 @@ import { useCommand } from "./components/useCommand";
 export type PlotConfig = {
   id: string;
   type: "quad" | "linear" | "sin" | "cos";
-  params: { a: number; b: number; c?: number; d?: number };
+  params: {
+    a: { val: number; strVal: string };
+    b: { val: number; strVal: string };
+    c?: { val: number; strVal: string };
+    d?: { val: number; strVal: string };
+  };
   mathFunction: (x: number) => number;
   color: string;
   expression: string;
