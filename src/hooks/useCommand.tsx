@@ -1,5 +1,6 @@
 import { type Dispatch, type SetStateAction } from "react";
 import { type PlotConfig, type Settings } from "../App";
+import { quadFn } from "./useCommandFns/quadFn";
 
 type UseCommandProps = {
   plots: PlotConfig[];
@@ -109,12 +110,12 @@ export function useCommand({
       } = params;
       switch (type) {
         case "quad":
-          return `f(x) = ${a.strVal}x² ${b.strVal === "0" ? "" : `+ ${b.strVal}x`} ${c.strVal === "0" ? "" : `+ ${c.strVal}`}`;
+          return `f(x) = ${a.strVal} * x² ${b.strVal === "0" ? "" : `+ ${b.strVal}x`} ${c.strVal === "0" ? "" : `+ ${c.strVal}`}`;
         case "linear":
-          return `f(x) = ${a.strVal}x ${b.strVal === "0" ? "" : `+ ${b.strVal}`}`;
+          return `f(x) = ${a.strVal} * x ${b.strVal === "0" ? "" : `+ ${b.strVal}`}`;
         case "sin":
         case "cos":
-          return `f(x) = ${a.strVal} * ${type}(${b.strVal}x${c.strVal === "0" ? "" : ` + ${c.strVal}`}) ${d.strVal === "0" ? "" : `+ ${d.strVal}`}`;
+          return `f(x) = ${a.strVal} * ${type}(${b.strVal} * x${c.strVal === "0" ? "" : ` + ${c.strVal}`}) ${d.strVal === "0" ? "" : `+ ${d.strVal}`}`;
         default:
           addMessage(
             "Error: Expression generation for this type not implemented.",
@@ -125,35 +126,7 @@ export function useCommand({
 
     switch (cmd) {
       case "quad": {
-        if (args.length < 4) {
-          addMessage("Error: Insufficient arguments for 'quad' command.");
-          break;
-        }
-        const a = getNum(0, 1);
-        const b = getNum(1, 0);
-        const c = getNum(2, 0);
-        const id = args[3];
-        const color = args[4] || "";
-
-        if (!id) {
-          addMessage(
-            "Error: 'quad' command requires an ID as the 4th argument.",
-          );
-          break;
-        }
-
-        // Validação de ID movida para cá
-        if (plots.some((p) => p.id === id)) {
-          addMessage(`Error: ID '${id}' already exists.`);
-          break;
-        }
-
-        const newPlot = createPlot("quad", { a, b, c }, id, color);
-
-        if (!newPlot) break;
-
-        setPlots((prev) => [...prev, newPlot]);
-        addMessage(`quad '${id}' plotted.`);
+        quadFn(args, setPlots, addMessage, plots, getNum);
         break;
       }
 

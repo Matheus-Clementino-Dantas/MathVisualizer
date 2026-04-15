@@ -4,7 +4,8 @@ import { NavBar } from "./components/NavBar";
 import { CartesianPlan } from "./components/CartesianPlane";
 import { useState } from "react";
 import { Messages } from "./components/Messages";
-import { useCommand } from "./components/useCommand";
+import { useCommand } from "./hooks/useCommand";
+import { createContext } from "react";
 
 export type PlotConfig = {
   id: string;
@@ -42,6 +43,7 @@ function App() {
   const addMessage = (text: string) => {
     setMessages((prev) => [...prev, { id: Date.now(), text: text }]);
   };
+  const CommandContext = createContext({ setPlots, addMessage });
   const { processCommand } = useCommand({
     plots,
     setPlots,
@@ -50,12 +52,14 @@ function App() {
   });
 
   return (
-    <div className="h-screen bg-bg ">
-      <NavBar processCommand={processCommand} />
-      <CartesianPlan settings={settings} plots={plots} />
-      <Messages messages={messages} setMessages={setMessages} />
-      <ActivePlots plots={plots} />
-    </div>
+    <CommandContext.Provider value={{ setPlots, addMessage }}>
+      <div className="h-screen bg-bg ">
+        <NavBar processCommand={processCommand} />
+        <CartesianPlan settings={settings} plots={plots} />
+        <Messages messages={messages} setMessages={setMessages} />
+        <ActivePlots plots={plots} />
+      </div>
+    </CommandContext.Provider>
   );
 }
 
