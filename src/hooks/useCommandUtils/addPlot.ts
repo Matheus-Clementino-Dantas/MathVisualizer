@@ -10,7 +10,7 @@ export function addPlot(
   plots: PlotConfig[],
 ) {
   if (!id) {
-    addMessage(`Error: '${type}' command requires an ID as the 4th argument.`);
+    addMessage(`Error: '${type}' command requires an ID argument.`);
     return;
   }
 
@@ -24,5 +24,5 @@ export function addPlot(
   if (!newPlot) return;
 
   setPlots((prev) => [...prev, newPlot]);
-  addMessage(` ${type} '${id}' plotted.`);
+  addMessage(`${type} '${id}' plotted.`);
 }

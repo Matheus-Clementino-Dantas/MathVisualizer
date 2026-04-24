@@ -1,6 +1,8 @@
 import { type Dispatch, type SetStateAction } from "react";
 import { type PlotConfig, type Settings } from "../App";
 import { quadFn } from "./useCommandFns/quadFn";
+import { linearFn } from "./useCommandFns/linearFn";
+import { cosSinFn } from "./useCommandFns/cosSinFn";
 
 type UseCommandProps = {
   plots: PlotConfig[];
@@ -131,52 +133,13 @@ export function useCommand({
       }
 
       case "linear": {
-        if (args.length < 3) {
-          addMessage("Error: Insufficient arguments for 'linear' command.");
-          break;
-        }
-        const a = getNum(0, 1);
-        const b = getNum(1, 0);
-        const id = args[2] || crypto.randomUUID();
-        const color = args[3] || "";
-
-        if (plots.some((p) => p.id === id)) {
-          addMessage(`Error: ID '${id}' already exists.`);
-          break;
-        }
-
-        // Usando a fábrica em vez de montar na mão
-        const newPlot = createPlot("linear", { a, b }, id, color);
-        if (!newPlot) break;
-
-        setPlots((prev) => [...prev, newPlot as PlotConfig]);
-        addMessage(`Linear '${id}' plotted.`);
+        linearFn(args, setPlots, addMessage, plots, getNum);
         break;
       }
 
       case "sin":
       case "cos": {
-        if (args.length < 5) {
-          addMessage(`Error: Insufficient arguments for '${cmd}' command.`);
-          break;
-        }
-        const a = getNum(0, 1);
-        const b = getNum(1, 1);
-        const c = getNum(2, 0);
-        const d = getNum(3, 0);
-        const id = args[4] || crypto.randomUUID();
-        const color = args[5] || "";
-
-        if (plots.some((p) => p.id === id)) {
-          addMessage(`Error: ID '${id}' already exists.`);
-          break;
-        }
-
-        const newPlot = createPlot(cmd, { a, b, c, d }, id, color);
-        if (!newPlot) break;
-
-        setPlots((prev) => [...prev, newPlot as PlotConfig]);
-        addMessage(`Function ${cmd} '${id}' plotted.`);
+        cosSinFn(args, setPlots, addMessage, plots, getNum, cmd);
         break;
       }
 
@@ -306,7 +269,8 @@ export function useCommand({
       }
 
       case "zoom": {
-        const zoomValue = args[0] || "on";
+        const zoomValue =
+          args[0] === "on" || args[0] === "off" ? args[0] : "off";
         setSettings((prev) => ({
           ...prev,
           zoom: zoomValue === "on",
