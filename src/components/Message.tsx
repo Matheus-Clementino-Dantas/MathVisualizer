@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 export function Message({
   text,
   onClose,
@@ -6,13 +6,18 @@ export function Message({
   text: string;
   onClose: () => void;
 }) {
+  const onCloseRef = useRef(onClose);
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
   const [fade, setFade] = useState(false);
   useEffect(() => {
     const timer = setTimeout(() => {
       setFade(true);
     }, 3000);
     const removeTimer = setTimeout(() => {
-      onClose();
+      onCloseRef.current();
     }, 3500);
     return () => {
       clearTimeout(timer);

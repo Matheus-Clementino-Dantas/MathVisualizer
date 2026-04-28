@@ -5,7 +5,6 @@ import { CartesianPlan } from "./components/CartesianPlane";
 import { useState } from "react";
 import { Messages } from "./components/Messages";
 import { useCommand } from "./hooks/useCommand";
-import { createContext } from "react";
 
 export type PlotConfig = {
   id: string;
@@ -41,9 +40,12 @@ function App() {
     viewBox: { x: [-10, 10], y: [-10, 10] },
   });
   const addMessage = (text: string) => {
-    setMessages((prev) => [...prev, { id: Date.now(), text: text }]);
+    setMessages((prev) => [
+      ...prev,
+      { id: Date.now() * Math.random(), text: text },
+    ]);
   };
-  const CommandContext = createContext({ setPlots, addMessage });
+
   const { processCommand } = useCommand({
     plots,
     setPlots,
@@ -52,14 +54,12 @@ function App() {
   });
 
   return (
-    <CommandContext.Provider value={{ setPlots, addMessage }}>
-      <div className="h-screen bg-bg ">
-        <NavBar processCommand={processCommand} />
-        <CartesianPlan settings={settings} plots={plots} />
-        <Messages messages={messages} setMessages={setMessages} />
-        <ActivePlots plots={plots} />
-      </div>
-    </CommandContext.Provider>
+    <div className="h-screen bg-bg ">
+      <NavBar processCommand={processCommand} />
+      <CartesianPlan settings={settings} plots={plots} />
+      <Messages messages={messages} setMessages={setMessages} />
+      <ActivePlots plots={plots} />
+    </div>
   );
 }
 

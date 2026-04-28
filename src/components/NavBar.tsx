@@ -73,7 +73,7 @@ export function NavBar({
             <li>
               <a
                 href="#willbeimplementedsoon"
-                className="text-text hover:text-green-500 transition-colors text-sm font-medium lg:text-lg"
+                className="text-text hover:text-green-500 transition-colors text-sm font-medium lg:text-lg font-site"
               >
                 Guide
               </a>
@@ -81,7 +81,7 @@ export function NavBar({
             <li>
               <a
                 href="#willbeimplementedsoon"
-                className="text-text hover:text-green-500 transition-colors text-sm font-medium lg:text-lg"
+                className="text-text hover:text-green-500 transition-colors text-sm font-medium lg:text-lg font-site"
               >
                 About
               </a>
@@ -90,6 +90,7 @@ export function NavBar({
               <a
                 href="https://github.com/Matheus-Clementino-Dantas/MathVisualizer"
                 target="_blank"
+                className="text-text hover:text-green-500 transition-colors text-sm font-medium lg:text-lg font-site"
               >
                 <GithubIcon className="w-4 h-4 sm:w-6 sm:h-6" />
               </a>
