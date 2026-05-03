@@ -1,15 +1,12 @@
-import { type PlotConfig } from "../../App";
+import { type plotFnParams } from "../../types/types";
 import { addPlot } from "../useCommandUtils/addPlot";
-export function linearFn(
-  args: string[],
-  setPlots: React.Dispatch<React.SetStateAction<PlotConfig[]>>,
-  addMessage: (text: string) => void,
-  plots: PlotConfig[],
-  getNum: (
-    index: number,
-    defaultVal: number,
-  ) => { val: number; strVal: string },
-) {
+export function linearFn({
+  args,
+  setPlots,
+  addMessage,
+  plots,
+  getNum,
+}: plotFnParams) {
   if (args.length < 3) {
     addMessage("Error: Insufficient arguments for 'linear' command.");
     return;

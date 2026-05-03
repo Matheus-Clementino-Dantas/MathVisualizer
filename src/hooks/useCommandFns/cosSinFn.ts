@@ -1,16 +1,13 @@
-import { type PlotConfig } from "../../App";
+import { type plotFnParams } from "../../types/types";
 import { addPlot } from "../useCommandUtils/addPlot";
-export function cosSinFn(
-  args: string[],
-  setPlots: React.Dispatch<React.SetStateAction<PlotConfig[]>>,
-  addMessage: (text: string) => void,
-  plots: PlotConfig[],
-  getNum: (
-    index: number,
-    defaultVal: number,
-  ) => { val: number; strVal: string },
-  type: "cos" | "sin",
-) {
+export function cosSinFn({
+  args,
+  setPlots,
+  addMessage,
+  plots,
+  getNum,
+  type,
+}: plotFnParams & { type: "cos" | "sin" }) {
   if (args.length < 5) {
     addMessage(`Error: Insufficient arguments for '${type}' command.`);
   }

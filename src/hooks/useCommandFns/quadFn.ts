@@ -1,15 +1,12 @@
-import { type PlotConfig } from "../../App";
+import { type plotFnParams } from "../../types/types";
 import { addPlot } from "../useCommandUtils/addPlot";
-export function quadFn(
-  args: string[],
-  setPlots: React.Dispatch<React.SetStateAction<PlotConfig[]>>,
-  addMessage: (text: string) => void,
-  plots: PlotConfig[],
-  getNum: (
-    index: number,
-    defaultVal: number,
-  ) => { val: number; strVal: string },
-) {
+export function quadFn({
+  args,
+  setPlots,
+  addMessage,
+  plots,
+  getNum,
+}: plotFnParams) {
   if (args.length < 4) {
     addMessage("Error: Insufficient arguments for 'quad' command.");
     return;
