@@ -1,13 +1,9 @@
 import { type plotFnParams } from "../../types/types";
 import { addPlot } from "../useCommandUtils/addPlot";
-export function cosSinFn({
-  args,
-  setPlots,
-  addMessage,
-  plots,
-  getNum,
-  type,
-}: plotFnParams & { type: "cos" | "sin" }) {
+export function cosSinFn(
+  { args, setPlots, addMessage, plots, getNum }: plotFnParams,
+  type: "cos" | "sin",
+) {
   if (args.length < 5) {
     addMessage(`Error: Insufficient arguments for '${type}' command.`);
   }
