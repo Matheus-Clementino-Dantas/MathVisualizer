@@ -57,7 +57,7 @@ export function NavBar({
                 }}
               />
               <button
-                className="text-green-500 cursor-pointer"
+                className={`${command ? "text-green-500" : "text-gray-600"} cursor-pointer`}
                 aria-label="execute"
                 onClick={() => {
                   processCommand(command);
