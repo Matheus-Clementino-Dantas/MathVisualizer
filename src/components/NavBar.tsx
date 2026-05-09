@@ -63,6 +63,7 @@ export function NavBar({
                   processCommand(command);
                   setCommand("");
                 }}
+                disabled={!command.trim()}
               >
                 <Play />
               </button>
@@ -86,7 +87,7 @@ export function NavBar({
                 About
               </a>
             </li>
-            <li className="text-text hover:text-green-500">
+            <li className="text-text hover:text-green-500" aria-label="Github">
               <a
                 href="https://github.com/Matheus-Clementino-Dantas/MathVisualizer"
                 target="_blank"
@@ -99,6 +100,7 @@ export function NavBar({
               <button
                 className={`cursor-pointer flex text-text justify-center transition-colors items-center ${theme === "light" ? "hover:text-indigo-400" : "hover:text-amber-300"}`}
                 onClick={toggleTheme}
+                aria-label="change color mode"
               >
                 <SunMoon className="w-5 h-5 sm:w-8 sm:h-8" />
               </button>
