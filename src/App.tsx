@@ -26,6 +26,10 @@ export type Settings = {
     y: [number, number];
   };
   zoom?: boolean;
+  pan: boolean;
+  aspRatio: "contain" | false;
+  labelX: number;
+  labelY: number;
 };
 
 type Message = {
@@ -38,6 +42,10 @@ function App() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [settings, setSettings] = useState<Settings>({
     viewBox: { x: [-10, 10], y: [-10, 10] },
+    pan: true,
+    aspRatio: "contain",
+    labelY: 1,
+    labelX: 1,
   });
   const addMessage = (text: string) => {
     setMessages((prev) => [

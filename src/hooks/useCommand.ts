@@ -84,26 +84,24 @@ export function useCommand({
       }
 
       case "viewbox": {
-        if (args.length < 4) {
+        if (args.length < 2) {
           addMessage("Error: Insufficient arguments for 'viewbox' command.");
           return;
         }
-        const xMin = Number(args[0]);
-        const xMax = Number(args[1]);
-        const yMin = Number(args[2]);
-        const yMax = Number(args[3]);
+        const xMax = Number(args[0]);
+        const yMax = Number(args[1]);
 
-        if (isNaN(xMin) || isNaN(xMax) || isNaN(yMin) || isNaN(yMax)) {
+        if (isNaN(xMax) || isNaN(yMax) || xMax <= 0 || yMax <= 0) {
           addMessage("Error: Invalid arguments for 'viewbox' command.");
           return;
         }
 
         setSettings((prev) => ({
           ...prev,
-          viewBox: { x: [xMin, xMax], y: [yMin, yMax] },
+          viewBox: { x: [-xMax, xMax], y: [-yMax, yMax] },
         }));
         addMessage(
-          `ViewBox updated: X:[${xMin}, ${xMax}] Y:[${yMin}, ${yMax}]`,
+          `ViewBox updated: X:[${-xMax}, ${xMax}] Y:[${-yMax}, ${yMax}]`,
         );
         break;
       }
@@ -127,6 +125,63 @@ export function useCommand({
           zoom: zoomValue === "on",
         }));
         addMessage(`Zoom ${zoomValue}`);
+        break;
+      }
+
+      case "aspratio": {
+        if (
+          (args[0] !== "contain" && args[0] !== "false") ||
+          args.length === 0
+        ) {
+          addMessage("Error: Invalid argument for 'aspratio' command.");
+          return;
+        }
+        const aspValue = args[0] === "contain" ? "contain" : false;
+        setSettings((prev) => ({
+          ...prev,
+          aspRatio: aspValue,
+        }));
+        addMessage(`Aspect Ratio set to ${aspValue}`);
+        break;
+      }
+
+      case "pan": {
+        if ((args[0] !== "true" && args[0] !== "false") || args.length === 0) {
+          addMessage("Error: Invalid argument for 'pan' command.");
+          return;
+        }
+        const panValue = args[0] === "true" ? true : false;
+        setSettings((prev) => ({
+          ...prev,
+          pan: panValue,
+        }));
+        addMessage(`Panning set to ${panValue}`);
+        break;
+      }
+
+      case "label": {
+        if (args.length < 2) {
+          addMessage("Error: Insufficient arguments for 'label' command.");
+          return;
+        }
+
+        const [labelX, labelY] = args;
+
+        if (
+          isNaN(Number(labelX)) ||
+          isNaN(Number(labelY)) ||
+          Number(labelX) <= 0 ||
+          (Number(labelY) <= 0 && labelX !== "pi" && labelY !== "pi")
+        ) {
+          addMessage("Error: Invalid arguments for 'label' command.");
+          return;
+        }
+        setSettings((prev) => ({
+          ...prev,
+          labelX: labelX === "pi" ? Math.PI : Number(labelX) || prev.labelX,
+          labelY: labelY === "pi" ? Math.PI : Number(labelY) || prev.labelY,
+        }));
+        addMessage(`Labels updated: X: ${labelX}, Y: ${labelY}`);
         break;
       }
 

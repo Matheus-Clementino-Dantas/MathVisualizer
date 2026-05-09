@@ -1,21 +1,15 @@
-import { Mafs, Coordinates, Plot } from "mafs";
+import { Mafs, Coordinates, Plot, labelPi } from "mafs";
 import { useState, useEffect } from "react";
+import { type Settings } from "../App";
 
-type Settings = {
-  viewBox: {
-    x: [number, number];
-    y: [number, number];
-  };
-  zoom?: boolean;
-};
 type PlotConfig = {
   id: string;
   mathFunction: (x: number) => number;
   color?: string;
 };
 type Props = {
-  settings: Settings;
   plots: PlotConfig[];
+  settings: Settings;
 };
 
 export function CartesianPlan({ settings, plots }: Props) {
@@ -42,8 +36,23 @@ export function CartesianPlan({ settings, plots }: Props) {
         height={size.height}
         viewBox={settings.viewBox}
         zoom={settings.zoom}
+        preserveAspectRatio={settings.aspRatio}
+        pan={settings.pan}
       >
-        <Coordinates.Cartesian subdivisions={1} />
+        <Coordinates.Cartesian
+          subdivisions={1}
+          yAxis={{
+            lines: settings.labelY,
+
+            labels: (n) =>
+              `${settings.labelY === Math.PI ? labelPi : settings.labelY * n}`,
+          }}
+          xAxis={{
+            lines: settings.labelX,
+            labels: (n) =>
+              `${settings.labelX === Math.PI ? labelPi : settings.labelX * n}`,
+          }}
+        />
         {plots.map((plot) => (
           <Plot.OfX key={plot.id} y={plot.mathFunction} color={plot.color} />
         ))}
