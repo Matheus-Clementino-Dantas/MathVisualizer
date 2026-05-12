@@ -7,6 +7,7 @@ type PlotConfig = {
   mathFunction: (x: number) => number;
   color?: string;
 };
+
 type Props = {
   plots: PlotConfig[];
   settings: Settings;
@@ -43,14 +44,11 @@ export function CartesianPlan({ settings, plots }: Props) {
           subdivisions={1}
           yAxis={{
             lines: settings.labelY,
-
-            labels: (n) =>
-              `${settings.labelY === Math.PI ? labelPi : settings.labelY * n}`,
+            labels: settings.labelY === Math.PI ? labelPi : (n) => n,
           }}
           xAxis={{
             lines: settings.labelX,
-            labels: (n) =>
-              `${settings.labelX === Math.PI ? labelPi : settings.labelX * n}`,
+            labels: settings.labelX === Math.PI ? labelPi : (n) => n,
           }}
         />
         {plots.map((plot) => (

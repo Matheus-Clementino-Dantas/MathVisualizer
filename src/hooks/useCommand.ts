@@ -162,29 +162,33 @@ export function useCommand({
       case "label": {
         if (args.length < 2) {
           addMessage("Error: Insufficient arguments for 'label' command.");
-          return;
+          break;
         }
 
-        const [labelX, labelY] = args;
+        const [argX, argY] = args;
 
-        if (
-          isNaN(Number(labelX)) ||
-          isNaN(Number(labelY)) ||
-          Number(labelX) <= 0 ||
-          (Number(labelY) <= 0 && labelX !== "pi" && labelY !== "pi")
-        ) {
-          addMessage("Error: Invalid arguments for 'label' command.");
-          return;
+        const parseLabel = (val: string) =>
+          val === "pi" ? Math.PI : Number(val);
+
+        const valX = parseLabel(argX);
+        const valY = parseLabel(argY);
+
+        if (isNaN(valX) || valX <= 0 || isNaN(valY) || valY <= 0) {
+          addMessage(
+            "Error: Invalid arguments for 'label' command. Use numbers or 'pi'.",
+          );
+          break;
         }
+
         setSettings((prev) => ({
           ...prev,
-          labelX: labelX === "pi" ? Math.PI : Number(labelX) || prev.labelX,
-          labelY: labelY === "pi" ? Math.PI : Number(labelY) || prev.labelY,
+          labelX: valX,
+          labelY: valY,
         }));
-        addMessage(`Labels updated: X: ${labelX}, Y: ${labelY}`);
+
+        addMessage(`Labels updated: X: ${argX}, Y: ${argY}`);
         break;
       }
-
       case "clear": {
         setPlots([]);
         addMessage("Cartesian plane cleared.");
